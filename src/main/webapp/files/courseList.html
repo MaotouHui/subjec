@@ -49,36 +49,144 @@
 
 		</script>
 		<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	    
+	    <script type="text/javascript" src="../js/jquery-1.9.1.js"></script>
+	    
+	    <script type="text/javascript">
+	    
+	          function findAll() {
+				 $.ajax({
+	               type:"get",
+	               url:"../servlet/AdminServlet",
+	               data:"method=tcFindAll",
+	               async:false,
+	               success:function(data){
+	               //{"cno":4,"name":"servlet","credit":5,"periodstart":"八月 22, 2017","periodend":"八月 24, 2017","tea":{"tno":2,"tname":"刘老师","pwd":"123","phone":"123456","hiredate":"八月 21, 2017","remark":"帅哥"}},{"cno":3,"name":"js","credit":5,"periodstart":"八月 22, 2017","periodend":"八月 24, 2017","tea":{"tno":2,"tname":"刘
+	              
+	                 var  list= JSON.parse(data); 
+	                 
+	                 $("#tab").html("");
+	                 for(var  i  in list){
+	                   
+	                   $("#tab").append('<tr>'+
+											'<td bgcolor="#EEEEEE"><input type="checkbox" name="delid"/></td>'+
+											'<td width="9%" height="20" align="center" bgcolor="#EEEEEE">'+list[i].cno+'</td>'+
+											'<td width="9%" align="center" bgcolor="#EEEEEE">'+list[i].name+'</td>'+
+											'<td width="9%" align="center" bgcolor="#EEEEEE">'+list[i].credit+'</td>'+
+											'<td width="9%" align="center" bgcolor="#EEEEEE">'+list[i].periodstart+'</td>'+
+											'<td width="10%" align="center" bgcolor="#EEEEEE">'+list[i].periodend+'</td>'+
+											'<td width="4%" align="center" bgcolor="#EEEEEE">'+(typeof list[i].tea.tname=="undefined"?"暂无老师":list[i].tea.tname)+'</td>'+
+											'<td width="4%" align="center" bgcolor="#EEEEEE">'+list[i].tea.phone+'</td>'+
+											'<td bgcolor="#EEEEEE"><a href="javascript:void(0)" onclick="remove('+list[i].cno+','+list[i].tea.tno+')">删除</a>&nbsp;|&nbsp;<a href="#">修改</a></td>'+
+										'</tr>');
+	               }
+	              }
+	              });
+				
+				
+			}
+	    
+	    
+	         $(function(){
+	              
+	              findAll();
+	             
+	             $.ajax({
+	                type:"get",
+	                url:"../servlet/AdminServlet",
+	                data:"method=couFindAll",
+	                async:false,
+	                success:function(data){
+	                   //[{"cno":30,"name":"www","credit":7,"periodstart":"一月 1, 2017","periodend":"八月 30, 2017"},{"cno":1,"name":"html","credit":5,"periodstart":"八月 22, 2017","periodend":"八月 24, 2017
+	                    
+	                   var  list= JSON.parse(data);
+	                   
+	                   for(var i  in list){
+	                      
+	                      $("#cou").append("<option value='"+list[i].cno+"'>"+list[i].name+"</option>")
+	                    }
+	                } 
+	             });
+	             
+	             $.ajax({
+	               type:"get",
+	               url:"../servlet/AdminServlet",
+	               data:"method=teaFindAll",
+	               async:false,
+	               success:function(data){
+	               
+	                var  list=  JSON.parse(data);
+	                
+	                for(var i  in  list){
+	                
+	                  $("#tea").append("<option value='"+list[i].tno+"' >"+list[i].tname+"</option>")
+	                
+	                }
+	               
+	               }
+	             
+	             });
+	            
+	              /******分配课程的操作**********/
+	              
+	              $("#sub").click(function(){
+	              
+	                  /*   var  cno=$("#cou").val();
+	                    
+	                    var tno=$("#tea").val(); */
+	                    
+	                   // alert(cno+"---"+tno);
+	              
+	                   var val= $("form").serialize();
+	                   
+	                  // alert(val);
+	              
+	                   $.post("../servlet/AdminServlet?method=tcRegister",val,function(data){
+	                   
+	                         if(data>0){
+	                            alert("添加成功");
+	                            findAll();
+	                         
+	                          }else if(data==-5){
+	                            alert("该课程已经分配给该老师");
+	                         
+	                          } else{
+	                            alert("添加失败");
+	                         }
+	                   })
+	               })
+	            })
+	            
+	            
+	            function remove(cno,tno) {
+				
+				var  flag= window.confirm("是否删除该数据");
+				
+				if(flag){
+				
+				     $.get("../servlet/AdminServlet?method=tcRemove","cno="+cno+"&tno="+tno,function(data){
+				     
+				        if(data>0){
+				          alert("删除成功");
+				          findAll();
+				          
+				        }else {
+				           alert("删除失败");
+				        
+				        }
+				     })
+				 }	
+			  }
+	         
+	         
+	    
+	    
+	    
+	    
+	    </script>
+	
 	</head>
-	<SCRIPT language=JavaScript>
-		function sousuo() {
-			window.open("gaojisousuo.htm", "", "depended=0,alwaysRaised=1,width=800,height=510,location=0,menubar=0,resizable=0,scrollbars=0,status=0,toolbar=0");
-		}
-
-		function selectAll() {
-			var obj = document.fom.elements;
-			for (var i = 0; i < obj.length; i++) {
-				if (obj[i].name == "delid") {
-					obj[i].checked = true;
-				}
-			}
-		}
-
-		function unselectAll() {
-			var obj = document.fom.elements;
-			for (var i = 0; i < obj.length; i++) {
-				if (obj[i].name == "delid") {
-					if (obj[i].checked == true) obj[i].checked = false;
-					else obj[i].checked = true;
-				}
-			}
-		}
-
-		function link() {
-			document.getElementById("fom").action = "yuangong.htm";
-			document.getElementById("fom").submit();
-		}
-	</SCRIPT>
+	
 
 	<body>
 		<form name="fom" id="fom" method="post">
@@ -94,21 +202,17 @@
 											<td width="20"></td>
 											<td>
 												给课程
-												<select name="select2">
+												<select name="cno"  id="cou">
 													<option>--请选择课程--</option>
-													<option>javase</option>
-													<option>javaee</option>
-													<option>oracle</option>
+													
 												</select>
 												指定教师
-												<select name="select2">
+												<select name="tno" id="tea">
 													<option>--请选择教师--</option>
-													<option>赵老师</option>
-													<option>钱老师</option>
-													<option>孙老师33</option>
+												
 												</select>
 												
-												<input name="Submit" type="button" class="right-button02" value="提 交" />
+												<input name="Submit" type="button" class="right-button02" value="提 交" id="sub" />
 											</td>
 										</tr>
 									</table>
@@ -125,8 +229,8 @@
 									<table width="95%" border="0" align="center" cellpadding="0" cellspacing="0">
 										<tr>
 											<td height="40" class="font42">
-												<table width="100%" border="0" cellpadding="4" cellspacing="1" bgcolor="#464646" class="newfont03">
-
+												<table width="100%" border="0" cellpadding="4" cellspacing="1" bgcolor="#464646" class="newfont03"  >
+                                            <thead>
 													<tr>
 														<td height="20" colspan="15" align="center" bgcolor="#EEEEEE" class="tablestyle_title" style="text-align: center;"> 课程列表 </td>
 													</tr>
@@ -141,50 +245,12 @@
 														<td width="4%" align="center" bgcolor="#EEEEEE">教师联系方式</td>
 														<td width="19%" align="center" bgcolor="#EEEEEE">操作</td>
 													</tr>
-													<tr>
-														<td bgcolor="#FFFFFF"><input type="checkbox" name="delid"/></td>
-														<td height="20" bgcolor="#FFFFFF"><a href="listyuangongmingxi.html">001</a></td>
-														<td bgcolor="#FFFFFF"><a href="listyuangongmingxi.html">Java</a></td>
-														<td bgcolor="#FFFFFF">4</td>
-														<td bgcolor="#FFFFFF">2017-02-10</td>
-														<td bgcolor="#FFFFFF">2017-02-30</td>
-														<td height="20" bgcolor="#FFFFFF">吴老师</td>
-														<td height="20" bgcolor="#FFFFFF">13499876543</td>
-														<td bgcolor="#FFFFFF"><a href="#">删除</a>&nbsp;|&nbsp;<a href="#">修改</a></td>
-													</tr>
-													<tr>
-														<td bgcolor="#FFFFFF"><input type="checkbox" name="delid"/></td>
-														<td height="20" bgcolor="#FFFFFF"><a href="listyuangongmingxi.html">002</a></td>
-														<td bgcolor="#FFFFFF"><a href="listyuangongmingxi.html">大学语文</a></td>
-														<td bgcolor="#FFFFFF">4</td>
-														<td bgcolor="#FFFFFF">2017-02-10</td>
-														<td bgcolor="#FFFFFF">2017-02-30</td>
-														<td height="20" bgcolor="#FFFFFF">赵老师</td>
-														<td height="20" bgcolor="#FFFFFF">13499876543</td>
-														<td bgcolor="#FFFFFF"><a href="#">删除</a>&nbsp;|&nbsp;<a href="#">修改</a></td>
-													</tr>
-													<tr>
-														<td bgcolor="#FFFFFF"><input type="checkbox" name="delid"/></td>
-														<td height="20" bgcolor="#FFFFFF"><a href="listyuangongmingxi.html">003</a></td>
-														<td bgcolor="#FFFFFF"><a href="listyuangongmingxi.html">C++</a></td>
-														<td bgcolor="#FFFFFF">4</td>
-														<td bgcolor="#FFFFFF">2017-02-10</td>
-														<td bgcolor="#FFFFFF">2017-02-30</td>
-														<td height="20" bgcolor="#FFFFFF">黄老师</td>
-														<td height="20" bgcolor="#FFFFFF">13499876543</td>
-														<td bgcolor="#FFFFFF"><a href="#">删除</a>&nbsp;|&nbsp;<a href="#">修改</a></td>
-													</tr>
-													<tr>
-														<td bgcolor="#FFFFFF"><input type="checkbox" name="delid"/></td>
-														<td height="20" bgcolor="#FFFFFF"><a href="listyuangongmingxi.html">004</a></td>
-														<td bgcolor="#FFFFFF"><a href="listyuangongmingxi.html">数据结构</a></td>
-														<td bgcolor="#FFFFFF">4</td>
-														<td bgcolor="#FFFFFF">2017-02-10</td>
-														<td bgcolor="#FFFFFF">2017-03-30</td>
-														<td height="20" bgcolor="#FFFFFF">刘老师</td>
-														<td height="20" bgcolor="#FFFFFF">13499876543</td>
-														<td bgcolor="#FFFFFF"><a href="#">删除</a>&nbsp;|&nbsp;<a href="#">修改</a></td>
-													</tr>
+										  </thead>	
+										  
+										  <tbody id="tab">
+										  
+										  
+										  </tbody>
 													
 												</table>
 											</td>
